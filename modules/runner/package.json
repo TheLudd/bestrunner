@@ -17,7 +17,8 @@
     "source-map-support": "^0.5.19"
   },
   "dependencies": {
+    "async-buffer-transform": "^1.0.0",
     "chai": "^4.2.0",
-    "through2": "^3.0.2"
+    "multipipe": "^4.0.0"
   }
 }

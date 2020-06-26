@@ -1,12 +1,4 @@
-function tryFn (fn) {
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(fn())
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
+import tryFn from './try-fn'
 
 export default function runTest (spec) {
   const { test } = spec

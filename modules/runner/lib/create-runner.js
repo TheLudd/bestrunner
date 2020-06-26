@@ -1,17 +1,21 @@
-import through2 from 'through2'
-// log added
-// log before run
-// run
-// log after run
-// create summary
+import multipipe from 'multipipe'
+import AsyncBufferTransform from 'async-buffer-transform'
+import tryFn from './try-fn'
 
 function asyncTransform (fn) {
-  return through2.obj((x, _, cb) => {
-    fn(x).then((result) => cb(null, result))
-  })
+  function transform (x) {
+    return tryFn(() => fn(x))
+  }
+  return new AsyncBufferTransform({ windowSize: Infinity, transform })
 }
 
 export default function createRunner (conf) {
-  const { runTest } = conf
-  return asyncTransform(runTest)
+  const {
+    postHooks = [],
+    preHooks = [],
+    runTest,
+  } = conf
+  const hooks = [ ...preHooks, runTest, ...postHooks ]
+    .map(asyncTransform)
+  return multipipe(hooks)
 }

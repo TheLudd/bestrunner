@@ -30,6 +30,60 @@ describe('createRunner', () => {
     })
     const resultStream = createTestStream([ 'test1' ])
       .pipe(runner)
-    assertStream(resultStream, [ 'test1 executed' ])
+    return assertStream(resultStream, [ 'test1 executed' ])
+  })
+
+  it('allows for pre test hooks', () => {
+    const runner = createRunner({
+      preHooks: [
+        (test) => Promise.resolve(`${test} added and then`),
+      ],
+      runTest: (test) => Promise.resolve(`${test} executed`),
+    })
+    const resultStream = createTestStream([ 'test1' ])
+      .pipe(runner)
+    return assertStream(resultStream, [ 'test1 added and then executed' ])
+  })
+
+  it('allows for post test hooks', () => {
+    const runner = createRunner({
+      postHooks: [
+        (test) => Promise.resolve(`${test} and then analyzed`),
+      ],
+      runTest: (test) => Promise.resolve(`${test} executed`),
+    })
+    const resultStream = createTestStream([ 'test1' ])
+      .pipe(runner)
+    return assertStream(resultStream, [ 'test1 executed and then analyzed' ])
+  })
+
+  describe('acceptance tests -', () => {
+    let runner
+    beforeEach(() => {
+      runner = createRunner({
+        preHooks: [
+          (test) => (`${test} added,`),
+        ],
+        postHooks: [
+          (test) => (`${test} and then analyzed`),
+        ],
+        runTest: (test) => Promise.resolve(`${test} executed`),
+      })
+    })
+    it('allows sync pre and post hooks', () => {
+      const resultStream = createTestStream([ 'test1' ])
+        .pipe(runner)
+      return assertStream(resultStream, [ 'test1 added, executed and then analyzed' ])
+    })
+
+    it('runs multiple tests', () => {
+      const resultStream = createTestStream([ 'test1', 'test2', 'test3' ])
+        .pipe(runner)
+      return assertStream(resultStream, [
+        'test1 added, executed and then analyzed',
+        'test2 added, executed and then analyzed',
+        'test3 added, executed and then analyzed',
+      ])
+    })
   })
 })
