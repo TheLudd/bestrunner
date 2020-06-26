@@ -148,7 +148,7 @@ function dot (d) {
   return Promise.resolve(d)
 }
 
-const bail = true
+const bail = false
 function runTest (d) {
   const {
     description,
@@ -248,7 +248,7 @@ tester.pipe(createPipeline(
   creatDotLogger()
 ))
 
-const delay = 100
+const delay = 0
 function work () {
   return Promise.delay(Math.floor(Math.random() * delay))
     .then(() => {
@@ -269,5 +269,5 @@ times((i) => {
   } else {
     tester.addTest(`Test ${i}`, work)
   }
-}, 5000)
+}, 4000)
 

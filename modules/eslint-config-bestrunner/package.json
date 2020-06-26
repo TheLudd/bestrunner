@@ -1,0 +1,14 @@
+{
+  "name": "@workingname/eslint-config",
+  "version": "0.0.0",
+  "main": ".eslintrc.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "eslint test.js"
+  },
+  "dependencies": {
+    "eslint": "^7.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.2"
+  }
+}

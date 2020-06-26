@@ -1,0 +1,6 @@
+require:
+  - '@babel/register'
+  - 'source-map-support'
+extension:
+  - js
+recursive: true
