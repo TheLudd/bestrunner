@@ -1,25 +1,30 @@
+/* eslint-disable max-classes-per-file */
 require('clear-console')()
-const colors = require('colors')
-const multipipe = require('multipipe')
-const AsyncBufferTransform = require('async-buffer-transform')
+require('@babel/register')({
+  presets: [ '@babel/preset-env' ],
+})
+require('colors')
 const chai = require('chai')
 const Promise = require('bluebird')
-const { times, pluck } = require('ramda')
+const { times } = require('ramda')
 const { Readable, Writable, Transform } = require('stream')
+const runTest = require('./modules/runner/lib/run-test').default
+const createRunner = require('./modules/runner/lib/create-runner').default
 
 const { equal } = chai.assert
 
 function writeAtLine (row, text) {
-  process.stdout.write('\033' + `[${row};0f` + '\033[K' + text)
+  process.stdout.write(`\x1B[${row};0f\x1B[K${text}`)
 }
 
 function writeAtColumn (nbr, text) {
   const { columns } = process.stdout
-  const row = Math.floor(nbr/columns) + 1
+  const row = Math.floor(nbr / columns) + 1
   const column = nbr % columns
-  process.stdout.write('\033' + `[${row};${column}f` + text)
+  process.stdout.write(`\x1B[${row};${column}f${text}`)
 }
 
+// eslint-disable-next-line new-parens
 const tester = new class extends Readable {
   constructor () {
     super({ objectMode: true })
@@ -32,10 +37,8 @@ const tester = new class extends Readable {
   }
 
   _read (size) {
-    let nextTest
-    let count = 0
     for (let i = 0; i < size && this.index < this.tests.length; i++) {
-      const index = this.index
+      const { index } = this
       const { test, description } = this.tests[index]
       this.push({
         description,
@@ -84,7 +87,7 @@ function createPerLineLogger () {
   }
 
   function logResult (d) {
-    const { nbr, size } = d
+    const { nbr } = d
     writeAtLine(nbr, formatResult(d))
     return Promise.resolve(d)
   }
@@ -99,26 +102,20 @@ function createPerLineLogger () {
 
 function creatDotLogger () {
   function logQueue (d) {
-    const { nbr, size } = d
+    const { nbr } = d
     writeAtColumn(nbr, '.'.cyan)
     return Promise.resolve(d)
   }
 
   function logPreRun (d) {
-    const { nbr, size, description } = d
+    const { nbr } = d
     writeAtColumn(nbr, '.'.yellow)
     return Promise.resolve(d)
   }
 
   function formatResult (d) {
-    const {
-      description,
-      nbr,
-      size,
-      status,
-    } = d
+    const { status } = d
     if (status === 'Error') {
-      const { error } = d
       return '.'.red
     }
 
@@ -130,7 +127,7 @@ function creatDotLogger () {
   }
 
   function logResult (d) {
-    const { nbr, size } = d
+    const { nbr } = d
     writeAtColumn(nbr, formatResult(d))
     return Promise.resolve(d)
   }
@@ -141,29 +138,6 @@ function creatDotLogger () {
     logPreRun,
     logResult,
   }
-}
-function dot (d) {
-  const { nbr, size } = d
-  writeAtColumn(nbr, '.'.cyan)
-  return Promise.resolve(d)
-}
-
-const bail = false
-function runTest (d) {
-  const {
-    description,
-    nbr,
-    size,
-    test,
-  } = d
-  return Promise.try(() => test())
-    .then(() => ({ status: 'Passed', ...d }))
-    .catch((e) => {
-      if (bail) {
-        return Promise.reject(new Error(`Test ${nbr} failed`))
-      }
-      return ({ status: 'Error', error: e, ...d })
-    })
 }
 
 class Summarize extends Transform {
@@ -176,10 +150,10 @@ class Summarize extends Transform {
     this.errors = []
   }
 
-  _transform(d, _, cb){
-    const { nbr, status, size } = d
+  _transform (d, _, cb) {
+    const { status } = d
     this.nbrCompleted++
-    if (status === 'Passed') {
+    if (status === 'passed') {
       this.nbrPassed++
     } else {
       this.errors.push(d)
@@ -203,15 +177,13 @@ class SummaryLogger extends Writable {
     this.getOffset = opts.getOffset
   }
 
-  _write(d, _, cb){
+  _write (d, _, cb) {
     const {
       errors,
-      nbr,
       nbrCompleted,
       nbrErrors,
       nbrPassed,
       size,
-      status,
     } = d
 
     const offset = this.getOffset(d)
@@ -222,31 +194,30 @@ class SummaryLogger extends Writable {
     writeAtLine(offset + 5, `${nbrPassed} passed`.green)
     writeAtLine(offset + 6, `${nbrErrors} errors`[color])
 
-    errors.map((item, i) => {
+    errors.forEach((item, i) => {
       const { description, error } = item
       writeAtLine(offset + 8 + i, `${description} - ${error.message}`.red)
-
     })
 
     cb()
   }
 }
 
-function createPipeline (c) {
-  return multipipe(
-    new AsyncBufferTransform({ windowSize: Infinity, transform: c.logQueue }),
-    new AsyncBufferTransform({ windowSize: Infinity, transform: c.logPreRun }),
-    new AsyncBufferTransform({ windowSize: Infinity, transform: runTest }),
-    new AsyncBufferTransform({ windowSize: Infinity, transform: c.logResult }),
-    new Summarize(),
-    new SummaryLogger({ getOffset: c.getOffset })
-  )
-}
+const perLine = false
+const {
+  getOffset,
+  logPreRun,
+  logQueue,
+  logResult,
+} = perLine ? createPerLineLogger() : creatDotLogger()
 
-tester.pipe(createPipeline(
-  // createPerLineLogger()
-  creatDotLogger()
-))
+const w = createRunner({
+  preHooks: [ logQueue, logPreRun ],
+  runTest,
+  postHooks: [ logResult ],
+})
+
+tester.pipe(w).pipe(new Summarize()).pipe(new SummaryLogger({ getOffset }))
 
 const delay = 0
 function work () {
@@ -270,4 +241,3 @@ times((i) => {
     tester.addTest(`Test ${i}`, work)
   }
 }, 4000)
-

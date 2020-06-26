@@ -8,14 +8,10 @@
     "test": "lerna run test"
   },
   "dependencies": {
-    "async-buffer-transform": "^1.0.0",
     "bluebird": "^3.7.2",
-    "chai": "^4.2.0",
     "clear-console": "^1.1.0",
     "colors": "^1.4.0",
-    "multipipe": "^4.0.0",
-    "ramda": "^0.27.0",
-    "through2": "^3.0.2"
+    "ramda": "^0.27.0"
   },
   "devDependencies": {
     "@workingname/eslint-config": "^0.0.0",
