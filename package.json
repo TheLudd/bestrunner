@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@workingname/eslint-config": "^0.0.0",
+    "@workingname/register": "^0.0.0",
     "lerna": "^3.22.1"
   },
   "name": "tester"

@@ -1,0 +1,17 @@
+{
+  "name": "@workingname/register",
+  "version": "0.0.0",
+  "main": "register.js",
+  "author": "Ludwig Magnusson <ludwig.magnusson@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "echo Testless"
+  },
+  "dependencies": {
+    "@babel/core": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "@babel/register": "^7.10.3",
+    "source-map-support": "^0.5.19"
+  }
+}

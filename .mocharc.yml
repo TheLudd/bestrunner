@@ -1,0 +1,5 @@
+require:
+  - '@workingname/register'
+extension:
+  - js
+recursive: true
