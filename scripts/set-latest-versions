@@ -12,5 +12,5 @@ if [[ -n "$diff" ]]; then
 	git add .circleci/config.yml
 	git commit -m "chore: set latest versions of node in circleci"
 	git push origin upgrade-node-versions
-	hub pull-request
+	hub pull-request --no-edit
 fi
