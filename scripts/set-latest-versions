@@ -1,0 +1,13 @@
+#!/bin/bash
+for v in 10 12 14;
+do
+	latest=`npx n ls-remote --all | ag "^$v" | head -n 1`
+	sed -i "s/- $v.*/- $latest/" .circleci/config.yml
+done
+
+diff=`git diff-files | ag .circleci/config.yml`
+
+if [[ -n "$diff" ]]; then
+	git add .circleci/config.yml
+	git commit -m "chore: set latest versions of node in circleci"
+fi
