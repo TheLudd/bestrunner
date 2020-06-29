@@ -8,6 +8,9 @@ done
 diff=`git diff-files | ag .circleci/config.yml`
 
 if [[ -n "$diff" ]]; then
+	git checkout -b upgrade-node-versions
 	git add .circleci/config.yml
 	git commit -m "chore: set latest versions of node in circleci"
+	git push origin upgrade-node-versions
+	hub pull-request
 fi
