@@ -1,0 +1,7 @@
+{
+  "name": "@bestrunner/utils",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Ludwig Magnusson <ludwig.magnusson@gmail.com>",
+  "license": "MIT"
+}

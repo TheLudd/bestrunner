@@ -4,8 +4,8 @@
     "modules/*"
   ],
   "scripts": {
-    "lint": "lerna run lint",
-    "test": "lerna run test"
+    "lint": "lerna run lint --parallel",
+    "test": "lerna run test --parallel"
   },
   "dependencies": {
     "bluebird": "^3.7.2",
