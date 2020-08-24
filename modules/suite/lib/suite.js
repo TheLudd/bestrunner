@@ -1,4 +1,4 @@
-import tryFn from '@bestrunner/utils/lib/try-fn'
+const tryFn = require('@bestrunner/utils/lib/try-fn')
 
 function asyncSequence (fnList) {
   const head = fnList[0]

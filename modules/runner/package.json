@@ -10,8 +10,8 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "mocha": "^8.0.1",
-    "chai": "^4.2.0"
+    "chai": "^4.2.0",
+    "mocha": "^8.1.1"
   },
   "dependencies": {
     "async-buffer-transform": "^1.0.0",
