@@ -13,18 +13,20 @@ jobs:
       - checkout
       - restore_cache:
           name: 'Restoring cache'
-          key: bestrunner-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
+          key: best-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
       - run:
           name: 'Install packages'
           command: yarn install --frozen-lockfile
       - save_cache:
           name: 'Saving cache'
-          key: bestrunner-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
+          key: best-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
           paths:
             - node_modules
             - modules/eslint-config-bestrunner/node_modules
             - modules/runner/node_modules
             - modules/suite/node_modules
+            - modules/utils/node_modules
+            - modules/register/node_modules
       - run:
           command: yarn test
           name: Run YARN tests
