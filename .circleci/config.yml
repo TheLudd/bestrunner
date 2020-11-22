@@ -3,23 +3,41 @@ orbs:
   node: circleci/node@4.0.0
 jobs:
   test:
-    executor:
-      name: node/default
+    docker:
+      - image: node:<< parameters.main-version >>
+    parameters:
+      main-version:
+        default: 12
+        type: integer
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: yarn
+      - restore_cache:
+          name: 'Restoring cache'
+          key: bestrunner-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
+      - run:
+          name: 'Install packages'
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: 'Saving cache'
+          key: bestrunner-<<parameters.main-version>>-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - modules/eslint-config-bestrunner/node_modules
+            - modules/runner/node_modules
+            - modules/suite/node_modules
       - run:
           command: yarn test
           name: Run YARN tests
+      - store_test_results:
+          path: test-results
+
 workflows:
   matrix-tests:
     jobs:
-      - node/test:
-          pkg-manager: yarn
+      - test:
           matrix:
             parameters:
-              version:
-                - 14.4.0
-                - 12.18.1
-                - 10.21.0
+              main-version:
+                - 14
+                - 12
+                - 10
