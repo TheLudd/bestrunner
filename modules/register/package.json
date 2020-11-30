@@ -9,7 +9,7 @@
     "test": "echo Testless"
   },
   "dependencies": {
-    "@babel/core": "^7.12.3",
+    "@babel/core": "^7.12.9",
     "@babel/preset-env": "^7.12.1",
     "@babel/register": "^7.12.1",
     "source-map-support": "^0.5.19"
