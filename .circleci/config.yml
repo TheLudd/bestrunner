@@ -38,6 +38,5 @@ workflows:
           matrix:
             parameters:
               main-version:
+                - 16
                 - 14
-                - 12
-                - 10
