@@ -11,12 +11,12 @@
     "bluebird": "^3.7.2",
     "clear-console": "^1.1.0",
     "colors": "^1.4.0",
-    "ramda": "^0.27.1"
+    "ramda": "^0.28.0"
   },
   "devDependencies": {
     "@workingname/eslint-config": "^0.0.0",
     "@workingname/register": "^0.0.0",
-    "lerna": "^3.22.1"
+    "lerna": "^4.0.0"
   },
   "name": "tester"
 }
